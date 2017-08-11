@@ -26,7 +26,7 @@
   <dependencies>
   	<dependency org="com.adaptris" name="adp-core" rev="${adp-core-version}" conf="compile->default" changing="true"/>
     <dependency org="com.adaptris" name="adp-core-apt" rev="${adp-core-version}" conf="compile->default;ant->default" changing="true"/>
-
+    
     <dependency org="com.adaptris" name="adp-stubs" rev="${adp-core-version}" changing="true" conf="test->default"/>
 
     <dependency org="org.nanohttpd" name="nanohttpd" rev="2.2.0" conf="compile->default" />

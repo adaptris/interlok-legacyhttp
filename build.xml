@@ -1,4 +1,4 @@
-﻿<project basedir="." default="compile" name="nanohttpd" xmlns:adapter="uri:adapter" xmlns:ivy="antlib:org.apache.ivy.ant">
+﻿<project basedir="." default="compile" name="legacyhttp" xmlns:adapter="uri:adapter" xmlns:ivy="antlib:org.apache.ivy.ant">
   <property file="build.properties"/>
   <property file="ivy.properties"/>
   <import file="${basedir}/resources/ivy/ant-ivy-includes.xml"/> <!-- Ivy tasks -->

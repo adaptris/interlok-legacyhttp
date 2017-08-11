@@ -27,4 +27,4 @@ log4j.properties
 target
 bin
 unit-tests.properties
-
+lib
