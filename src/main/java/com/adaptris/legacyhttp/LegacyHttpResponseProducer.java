@@ -18,8 +18,26 @@ import com.adaptris.core.ProduceOnlyProducerImp;
 import com.adaptris.core.http.server.HttpStatusProvider.HttpStatus;
 import com.adaptris.core.metadata.MetadataFilter;
 import com.adaptris.core.metadata.RemoveAllMetadataFilter;
+import com.adaptris.core.util.Args;
+import com.adaptris.core.util.ExceptionHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+/**
+ * Commit the response for requests coming from a {@link LegacyHttpConsumer}.
+ * 
+ * <p>
+ * There are some key differences between this and the standard jetty response producers :
+ * </p>
+ * <ul>
+ * <li>The payload if not empty, will always be sent</li>
+ * <li>Currently no support for {@code object metadata} style header handling. {@link MetadataFilter} is the only available
+ * implementation</li>
+ * <li>No support for dynamic HTTP status.</li>
+ * </ul>
+ * 
+ * @author ellidges
+ *
+ */
 @XStreamAlias("legacy-http-response-producer")
 @ComponentProfile(summary = "Write and commit the HTTP Response", tag = "producer,http,https", recommended ={ NullConnection.class})
 @DisplayOrder(order = {  "status", "metadataFilter"})
@@ -27,6 +45,7 @@ public class LegacyHttpResponseProducer extends ProduceOnlyProducerImp {
   
   @NotNull
   @Valid
+  @AutoPopulated
   private HttpStatus status;
   @Valid
   @AutoPopulated
@@ -45,7 +64,6 @@ public class LegacyHttpResponseProducer extends ProduceOnlyProducerImp {
 
   @Override
   public void init() throws CoreException {
-    if(status == null) throw new CoreException("No status provided");
   }
 
   @Override
@@ -62,7 +80,13 @@ public class LegacyHttpResponseProducer extends ProduceOnlyProducerImp {
 
   @Override
   public void prepare() throws CoreException {
-    
+    try {
+      Args.notNull(getStatus(), "status");
+      Args.notNull(getMetadataFilter(), "metadataFilter");
+    }
+    catch (IllegalArgumentException e) {
+      throw ExceptionHelper.wrapCoreException(e);
+    }
   }
 
   @Override
@@ -100,7 +124,7 @@ public class LegacyHttpResponseProducer extends ProduceOnlyProducerImp {
   }
 
   public void setMetadataFilter(MetadataFilter metadataFilter) {
-    this.metadataFilter = metadataFilter;
+    this.metadataFilter = Args.notNull(metadataFilter, "metadataFilter");
   }
 
 }

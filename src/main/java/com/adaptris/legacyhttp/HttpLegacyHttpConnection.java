@@ -12,10 +12,10 @@ import com.sun.net.httpserver.HttpServer;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- * Lightweight HTTP server using {@link HttpServer}
+ * Lightweight HTTP server using {@link HttpServer}.
  * <p>
  * Included to provide a mechanism for implementing HTTP services where Java 1.8 isn't available and you really don't want to use
- * Jetty. It is not as fully featured
+ * Jetty; it is not as fully featured.
  * </p>
  * 
  * @author ellidges

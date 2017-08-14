@@ -21,7 +21,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-public class RequestHandler implements HttpHandler {
+class RequestHandler implements HttpHandler {
 
   private transient Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
