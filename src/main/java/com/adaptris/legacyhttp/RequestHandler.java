@@ -11,14 +11,15 @@ import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreConstants;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.MetadataElement;
 import com.adaptris.core.http.server.HttpStatusProvider.HttpStatus;
+import com.adaptris.core.util.Args;
 import com.google.common.base.Splitter;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -26,98 +27,13 @@ import com.sun.net.httpserver.HttpHandler;
 
 public class RequestHandler implements HttpHandler {
 
-  Log log = LogFactory.getLog(RequestHandler.class);
+  private transient Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
-  private LegacyHttpConsumer consumer;
+  private transient LegacyHttpConsumer consumer;
 
   public RequestHandler(LegacyHttpConsumer consumer) {
-    if (consumer == null)
-      throw new NullPointerException("NanoHttpdConsumer may not be null");
-    this.consumer = consumer;
+    this.consumer = Args.notNull(consumer, "consumer");
   }
-
-  // protected Response processRequest(Map<String, String> urlParams,
-  // IHTTPSession session) {
-  // try {
-  // AdaptrisMessage msg = null;
-  // log.debug("Request headers:" + session.getHeaders());
-  // if (consumer.getEncoder() != null) {
-  // msg = consumer.getEncoder().readMessage(session.getInputStream());
-  // } else {
-  // OutputStream os = null;
-  // InputStream is = null;
-  // try {
-  // msg = defaultIfNull(consumer.getMessageFactory()).newMessage();
-  // os = msg.getOutputStream();
-  // is = session.getInputStream();
-  // if(is.available() > 0) {
-  // IOUtils.copy(is, os);
-  // }
-  // os.flush();
-  // } finally {
-  // IOUtils.closeQuietly(os);
-  // IOUtils.closeQuietly(is);
-  // }
-  // }
-  //
-  // msg.addMetadata(CoreConstants.JETTY_URI, session.getUri());
-  // msg.addMetadata(CoreConstants.HTTP_METHOD, session.getMethod().toString());
-  //
-  // if(session.getQueryParameterString() != null)
-  // msg.addMetadata(CoreConstants.JETTY_QUERY_STRING,
-  // session.getQueryParameterString());
-  //
-  // for (Entry<String, String> header : session.getHeaders().entrySet()) {
-  // msg.addMetadata("header." + header.getKey(), header.getValue());
-  // }
-  // for (Entry<String, String> param : urlParams.entrySet()) {
-  // msg.addMetadata("params." + param.getKey(), param.getValue());
-  // }
-  //
-  // ArrayBlockingQueue<NanoHttpdMonitor> queue = new ArrayBlockingQueue<>(1);
-  // msg.addObjectHeader(NanoHttpdConnection.NANO_HTTPD_SESSION_KEY, queue);
-  //
-  //
-  // consumer.retrieveAdaptrisMessageListener().onAdaptrisMessage(msg);
-  //
-  // NanoHttpdMonitor monitor = null;
-  // try {
-  // monitor = queue.poll(consumer.getRequestTimeout().getInterval(),
-  // consumer.getRequestTimeout().getUnit());
-  // } catch (InterruptedException e) {
-  // }
-  //
-  // if (monitor == null) {
-  // monitor = new NanoHttpdMonitor();
-  // log.error("No response received");
-  // monitor.status = Status.INTERNAL_ERROR;
-  // }
-  //
-  // if (monitor.status == null) {
-  // log.error("No status for response");
-  // monitor.status = Status.INTERNAL_ERROR;
-  // }
-  //
-  // Response r;
-  // if (monitor.result == null) {
-  // log.error("No message for response");
-  // r = NanoHTTPD.newFixedLengthResponse(monitor.status, "text/plain",
-  // "Unexpected exception");
-  // } else if(msg.getSize() > 0) {
-  // r = NanoHTTPD.newChunkedResponse(monitor.status,
-  // monitor.result.getMetadataValueIgnoreKeyCase(HttpConstants.CONTENT_TYPE),
-  // monitor.result.getInputStream());
-  // } else {
-  // r = NanoHTTPD.newFixedLengthResponse(monitor.status, "text/plain", "");
-  // }
-  // return r;
-  //
-  // } catch (Exception e) {
-  // log.error("Exception processing NanoHTTPD request", e);
-  // return NanoHTTPD.newFixedLengthResponse(Status.INTERNAL_ERROR,
-  // "text/plain", e.getMessage());
-  // }
-  // }
 
   @Override
   public void handle(HttpExchange exchange) throws IOException {

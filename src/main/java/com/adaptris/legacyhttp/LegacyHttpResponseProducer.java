@@ -2,9 +2,16 @@ package com.adaptris.legacyhttp;
 
 import java.util.Queue;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import com.adaptris.annotation.AutoPopulated;
+import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.MetadataCollection;
+import com.adaptris.core.NullConnection;
 import com.adaptris.core.ProduceDestination;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.ProduceOnlyProducerImp;
@@ -14,9 +21,16 @@ import com.adaptris.core.metadata.RemoveAllMetadataFilter;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("legacy-http-response-producer")
+@ComponentProfile(summary = "Write and commit the HTTP Response", tag = "producer,http,https", recommended ={ NullConnection.class})
+@DisplayOrder(order = {  "status", "metadataFilter"})
 public class LegacyHttpResponseProducer extends ProduceOnlyProducerImp {
   
+  @NotNull
+  @Valid
   private HttpStatus status;
+  @Valid
+  @AutoPopulated
+  @NotNull
   private MetadataFilter metadataFilter;
   
   public LegacyHttpResponseProducer() {
@@ -61,10 +75,10 @@ public class LegacyHttpResponseProducer extends ProduceOnlyProducerImp {
       }
       monitor.status  = getStatus().getStatusCode();
       if(!queue.offer(monitor)) {
-        throw new ProduceException("Unable to return NanoHTTPD response");
+        throw new ProduceException("Unable to return Legacy HTTPD response");
       }
     } else {
-      throw new ProduceException("Message does not have associated NanoHTTPD session");
+      throw new ProduceException("Message does not have associated Legacy HTTPD session");
     }
   }
 

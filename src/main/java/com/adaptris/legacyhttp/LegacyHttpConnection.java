@@ -1,25 +1,23 @@
 
 package com.adaptris.legacyhttp;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisConnectionImp;
 import com.adaptris.core.AdaptrisMessageConsumer;
 import com.adaptris.core.CoreException;
-import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- * Base class for Sun HttpServer based connections. Included to provide a mechanism
- * for implementing HTTP services where Java 1.8 isn't available and therefore
- * Jetty is not an option.
+ * Base class for Sun HttpServer based connections using {@link HttpServer}.
+ * <p>
+ * Included to provide a mechanism for implementing HTTP services where Java 1.8 isn't available and therefore Jetty is not an
+ * option (or you really don't want to use jetty).
+ * </p>
+ * 
  * @author ellidges
  */
-@XStreamAlias("legacy-http-connection")
 public abstract class LegacyHttpConnection extends AdaptrisConnectionImp {
   
   /**
@@ -31,26 +29,26 @@ public abstract class LegacyHttpConnection extends AdaptrisConnectionImp {
    */
   public static final String DEFAULT_SERVER_HOST="localhost";
   /**
-   * Default size of threadpool
+   * Default size of request backlog
    */
   public static final int DEFAULT_REQUEST_BACKLOG=10;
   
   /**
-   * Object metadata key for the nanohttpd monitor
+   * Object metadata key for the httpd monitor
    */
   public static final String LEGACY_HTTP_RESPONSE_QUEUE_KEY="legacyHttpResponseQueue";
   
   @XmlTransient
-  protected HttpServer server;
+  protected transient HttpServer server;
   
-  private int port;
+  @InputFieldDefault(value = "9090")
+  private Integer port;
+  @InputFieldDefault(value = DEFAULT_SERVER_HOST)
   private String host;
-  private int requestBacklog;
+  @InputFieldDefault(value = "10")
+  private Integer requestBacklog;
   
   public LegacyHttpConnection() {
-    setPort(DEFAULT_SERVER_PORT);
-    setHost(DEFAULT_SERVER_HOST);
-    setRequestBacklog(DEFAULT_REQUEST_BACKLOG);
   }
 
   @Override
@@ -58,24 +56,9 @@ public abstract class LegacyHttpConnection extends AdaptrisConnectionImp {
     super.addMessageConsumer(consumer);
   }
   
-  @Override
-  protected void prepareConnection() throws CoreException {
-    log.info("Preparing HTTP server");
-    try {
-      server = HttpServer.create(new InetSocketAddress(getHost(), getPort()), getRequestBacklog());
-    } catch (IOException e) {
-      throw new CoreException("Failed to create HTTP server", e);
-    }
-    
-    log.info("Setting up routes");
-    for (AdaptrisMessageConsumer consumer : super.retrieveMessageConsumers()) {
-      RequestHandler handler = new RequestHandler((LegacyHttpConsumer)consumer);      
-      HttpContext context = server.createContext(consumer.getDestination().getDestination(), handler);
-    }
-  }
 
   @Override
-  protected void initConnection() throws CoreException {
+  protected void prepareConnection() throws CoreException {
   }
 
   @Override
@@ -83,7 +66,7 @@ public abstract class LegacyHttpConnection extends AdaptrisConnectionImp {
     try {
       server.start();
     } catch (Exception e) {
-      throw new CoreException("Failed to start http server on [" + getHost() + ":" + getPort() + "]", e);
+      throw new CoreException("Failed to start http server on [" + host() + ":" + port() + "]", e);
     }
   }
 
@@ -96,12 +79,16 @@ public abstract class LegacyHttpConnection extends AdaptrisConnectionImp {
   protected void closeConnection() {
   }
 
-  public int getPort() {
+  public Integer getPort() {
     return port;
   }
 
-  public void setPort(int port) {
+  public void setPort(Integer port) {
     this.port = port;
+  }
+
+  int port() {
+    return getPort() != null ? getPort().intValue() : DEFAULT_SERVER_PORT;
   }
 
   public String getHost() {
@@ -112,12 +99,20 @@ public abstract class LegacyHttpConnection extends AdaptrisConnectionImp {
     this.host = host;
   }
 
-  public int getRequestBacklog() {
+  String host() {
+    return getHost() != null ? getHost() : DEFAULT_SERVER_HOST;
+  }
+
+  public Integer getRequestBacklog() {
     return requestBacklog;
   }
 
-  public void setRequestBacklog(int requestBacklog) {
+  public void setRequestBacklog(Integer requestBacklog) {
     this.requestBacklog = requestBacklog;
+  }
+
+  int requestBacklog() {
+    return getRequestBacklog() != null ? getRequestBacklog().intValue() : DEFAULT_REQUEST_BACKLOG;
   }
   
 }

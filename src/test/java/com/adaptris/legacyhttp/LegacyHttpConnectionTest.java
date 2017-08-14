@@ -9,12 +9,13 @@ import java.net.URL;
 import org.junit.Assert;
 
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.AdaptrisMessageConsumer;
 import com.adaptris.core.AdaptrisMessageListener;
 import com.adaptris.core.BaseCase;
 import com.adaptris.core.ConfiguredConsumeDestination;
 import com.adaptris.core.ProduceException;
+import com.adaptris.core.StandaloneConsumer;
 import com.adaptris.core.http.server.HttpStatusProvider.HttpStatus;
+import com.adaptris.core.util.LifecycleHelper;
 
 public class LegacyHttpConnectionTest extends BaseCase {
 
@@ -22,29 +23,21 @@ public class LegacyHttpConnectionTest extends BaseCase {
     super(testName);
   }
   
-  LegacyHttpConnection conn;
-  int port;
+  private StandaloneConsumer consumer;
+  private int port;
 
   @Override
   protected void setUp() throws Exception {
     ServerSocket ss = new ServerSocket(0);
     port = ss.getLocalPort();
     ss.close();
-    
-    conn = new HttpLegacyHttpConnection();
-    conn.setHost("localhost");
-    conn.setPort(port);
-    conn.setRequestBacklog(1);
-    
-    conn.addMessageConsumer(createConsumer());
-    
-    conn.prepareConnection();
-    conn.start();
+    consumer = LifecycleHelper.initAndStart(createConsumer(port));
   }
   
-  private AdaptrisMessageConsumer createConsumer() {
-    AdaptrisMessageConsumer consumer = new LegacyHttpConsumer();
-    consumer.setDestination(new ConfiguredConsumeDestination("/test"));
+  private StandaloneConsumer createConsumer(int port) {
+    StandaloneConsumer consumer = new StandaloneConsumer();
+    consumer.setConnection(new HttpLegacyHttpConnection("localhost", port, 1));
+    consumer.setConsumer(new LegacyHttpConsumer(new ConfiguredConsumeDestination("/test")));
     consumer.registerAdaptrisMessageListener(new AdaptrisMessageListener() {
       
       @Override
@@ -69,7 +62,7 @@ public class LegacyHttpConnectionTest extends BaseCase {
 
   @Override
   protected void tearDown() throws Exception {
-    conn.stop();
+    LifecycleHelper.stopAndClose(consumer);
   }
 
   public void testNoRoute() throws Exception {
