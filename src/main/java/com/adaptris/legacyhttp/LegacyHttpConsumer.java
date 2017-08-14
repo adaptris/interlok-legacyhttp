@@ -6,13 +6,19 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import com.adaptris.annotation.AdapterComponent;
+import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.AdaptrisMessageConsumerImp;
 import com.adaptris.core.ConsumeDestination;
 import com.adaptris.core.CoreException;
+import com.adaptris.core.http.server.HeaderHandler;
+import com.adaptris.core.http.server.ParameterHandler;
+import com.adaptris.core.util.Args;
+import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.util.TimeInterval;
+import com.sun.net.httpserver.HttpExchange;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -32,9 +38,21 @@ public class LegacyHttpConsumer extends AdaptrisMessageConsumerImp {
   @NotNull
   @AutoPopulated
   private TimeInterval requestTimeout;
+  @AutoPopulated
+  @Valid
+  @NotNull
+  @AdvancedConfig
+  private ParameterHandler<HttpExchange> parameterHandler;
+  @AutoPopulated
+  @Valid
+  @NotNull
+  @AdvancedConfig
+  private HeaderHandler<HttpExchange> headerHandler;
   
   public LegacyHttpConsumer() {
     setRequestTimeout(new TimeInterval(30L, TimeUnit.SECONDS));
+    setParameterHandler(new NoOpParameterHandler());
+    setHeaderHandler(new NoOpHeaderHandler());
   }
   
   public LegacyHttpConsumer(ConsumeDestination d) {
@@ -60,6 +78,14 @@ public class LegacyHttpConsumer extends AdaptrisMessageConsumerImp {
 
   @Override
   public void prepare() throws CoreException {
+    try {
+      Args.notNull(getParameterHandler(), "parameter-handler");
+      Args.notNull(getHeaderHandler(), "header-handler");
+      Args.notNull(getRequestTimeout(), "request-timeout");
+    }
+    catch (IllegalArgumentException e) {
+      throw ExceptionHelper.wrapCoreException(e);
+    }
     
   }
 
@@ -74,6 +100,32 @@ public class LegacyHttpConsumer extends AdaptrisMessageConsumerImp {
    * @param requestTimeout the timeout, default is 30 seconds.
    */
   public void setRequestTimeout(TimeInterval requestTimeout) {
-    this.requestTimeout = requestTimeout;
+    this.requestTimeout = Args.notNull(requestTimeout, "requestTimeout");
+  }
+
+  public ParameterHandler<HttpExchange> getParameterHandler() {
+    return parameterHandler;
+  }
+
+  /**
+   * Set the handler for parameters.
+   * 
+   * @param s the handler
+   */
+  public void setParameterHandler(ParameterHandler<HttpExchange> s) {
+    this.parameterHandler = Args.notNull(s, "parameterHandler");
+  }
+
+  public HeaderHandler<HttpExchange> getHeaderHandler() {
+    return headerHandler;
+  }
+
+  /**
+   * Set the handler for headers.
+   * 
+   * @param s the handler
+   */
+  public void setHeaderHandler(HeaderHandler<HttpExchange> s) {
+    this.headerHandler = Args.notNull(s, "headerHandler");
   }
 }

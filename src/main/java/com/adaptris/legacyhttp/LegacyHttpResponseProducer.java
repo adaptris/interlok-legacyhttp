@@ -38,6 +38,11 @@ public class LegacyHttpResponseProducer extends ProduceOnlyProducerImp {
     metadataFilter = new RemoveAllMetadataFilter();
   }
 
+  public LegacyHttpResponseProducer(HttpStatus status) {
+    this();
+    setStatus(status);
+  }
+
   @Override
   public void init() throws CoreException {
     if(status == null) throw new CoreException("No status provided");

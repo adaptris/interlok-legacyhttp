@@ -5,9 +5,6 @@ import static com.adaptris.core.AdaptrisMessageFactory.defaultIfNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.commons.io.IOUtils;
@@ -20,7 +17,6 @@ import com.adaptris.core.CoreException;
 import com.adaptris.core.MetadataElement;
 import com.adaptris.core.http.server.HttpStatusProvider.HttpStatus;
 import com.adaptris.core.util.Args;
-import com.google.common.base.Splitter;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -65,23 +61,11 @@ public class RequestHandler implements HttpHandler {
       msg.addMetadata(CoreConstants.JETTY_URI, exchange.getRequestURI().getPath());
       msg.addMetadata(CoreConstants.HTTP_METHOD, exchange.getRequestMethod());
 
-      for (Entry<String, List<String>> header : exchange.getRequestHeaders().entrySet()) {
-        if (header.getValue().size() > 1) {
-          for (int i = 0; i < header.getValue().size(); i++) {
-            msg.addMetadata("header." + header.getKey() + "." + i, header.getValue().get(i));
-          }
-        } else if (!header.getValue().isEmpty()) {
-          msg.addMetadata("header." + header.getKey(), header.getValue().get(0));
-        }
-      }
+      consumer.getHeaderHandler().handleHeaders(msg, exchange);
 
       if (exchange.getRequestURI().getQuery() != null) {
         msg.addMetadata(CoreConstants.JETTY_QUERY_STRING, exchange.getRequestURI().getQuery());
-        Map<String, String> params = Splitter.on("&").trimResults().withKeyValueSeparator("=")
-            .split(exchange.getRequestURI().getQuery());
-        for (Entry<String, String> param : params.entrySet()) {
-          msg.addMetadata("params." + param.getKey(), param.getValue());
-        }
+        consumer.getParameterHandler().handleParameters(msg, exchange);
       }
 
       ArrayBlockingQueue<LegacyHttpMonitor> queue = new ArrayBlockingQueue<>(1);
