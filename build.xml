@@ -11,7 +11,7 @@
 
     <property name="ivy.publish.revision" value="3.6-SNAPSHOT"/>  <!-- Version number of this artifact -->
     <property name="adp-core-version" value="3.6-SNAPSHOT"/>
-    <property name="manifest.title" value="Interlok/NanoHTTPD"/>
+    <property name="manifest.title" value="Interlok/LegacyHTTP"/>
     <property name="src.dir" value="${basedir}/src/main/java"/>
 
     <property name="testsrc.dir" value="${basedir}/src/test/java"/>
@@ -52,7 +52,7 @@
 
     <property name="project.dist.dir" value="${build.dir}/dist"/>
     <property name="project.jar.name" value = "${project.name}.jar"/>
-    <property name="project.pom.description" value="${manifest.title}"/>
+    <property name="project.pom.description" value="Interlok/LegacyHTTP - HTTP w/o Jetty"/>
 
     <property name="tmp.jar.name" value = "${project.name}-tmp.jar"/>
     <property name="yguard.report" value="${build.dir}/${project.name}-${jar.version}.yguard.xml.gz"/>
@@ -102,7 +102,7 @@
   <target name="javadoc" depends="prepare-ivy" description="Create javadocs">
     <adapter:uml-javadoc-creator sourcepath="${src.dir}" destdir="${api.doc.dir}">
       <groups>
-        <group title="Interlok/NanoHTTPD" packages="com.adaptris.nanohttpd:com.adaptris.nanohttpd.*"/>
+        <group title="Interlok/LegacyHttp" packages="com.adaptris.legacyhttp:com.adaptris.legacyhttp.*"/>
       </groups>
     </adapter:uml-javadoc-creator>
     <copy todir="${api.doc.dir}">
