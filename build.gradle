@@ -256,6 +256,7 @@ publishing {
         properties.appendNode("target", "3.6.4+")
         properties.appendNode("tags", "http,https")
         properties.appendNode("license", "false")
+        properties.appendNode("deprecated", "If you using Java8; there should be nothing stopping you from using Jetty")
       }
     }
   }
