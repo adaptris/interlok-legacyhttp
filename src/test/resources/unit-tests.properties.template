@@ -1,4 +1,4 @@
-junit.ProducerCase.baseDir=${basedir}/build/example-xml/producers
-junit.ConsumerCase.baseDir=${basedir}/build/example-xml/consumers
-junit.ServiceCase.baseDir=${basedir}/build/example-xml/services
+ProducerCase.baseDir=@BUILD_DIR@/examples/producers
+ConsumerCase.baseDir=@BUILD_DIR@/examples/consumers
+ServiceCase.baseDir=@BUILD_DIR@/examples/services
 
