@@ -27,7 +27,7 @@ ext {
   componentName='Interlok/LegacyHTTP'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '1.7.29'
+  slf4jVersion = '1.7.30'
 }
 
 if (JavaVersion.current().isJava8Compatible()) {
