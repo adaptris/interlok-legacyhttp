@@ -27,7 +27,7 @@ ext {
   componentName='Interlok/LegacyHTTP'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '1.7.28'
+  slf4jVersion = '1.7.29'
 }
 
 if (JavaVersion.current().isJava8Compatible()) {
@@ -51,6 +51,24 @@ ext.unitTestProperties = { ->
     return file.getName()
   }
   return  "unit-tests.properties.template"
+}
+ext.gitBranchNameOrTimestamp = { branchName ->
+  if (branchName.equals("HEAD") || branchName.equals("develop") || branchName.startsWith("release")) {
+    return new Date().format('HH:mm:ss z');
+  }
+  return branchName;
+}
+
+ext.buildInfo = { ->
+   new ByteArrayOutputStream().withStream { os ->
+      exec {
+        executable = "git"
+        args = ["rev-parse", "--abbrev-ref", "HEAD"]
+        standardOutput = os
+      }
+      def branchName = os.toString().replaceAll("\r", "").replaceAll("\n", "").trim();
+      return gitBranchNameOrTimestamp(branchName);
+    }
 }
 
 sourceCompatibility = 1.8
@@ -149,6 +167,7 @@ task generateVersion {
       entry(key: 'artifactId', value: project.name)
       entry(key: 'build.version', value: project.version)
       entry(key: 'build.date', value: new Date().format('yyyy-MM-dd'))
+      entry(key: 'build.info', value: buildInfo())
     }
   }
 }
@@ -175,10 +194,6 @@ javadoc {
     options.addStringOption "tagletpath", configurations.javadoc.asPath
     title= componentName
   }
-}
-
-jacoco {
-  toolVersion="0.8.3"
 }
 
 jacocoTestReport {
