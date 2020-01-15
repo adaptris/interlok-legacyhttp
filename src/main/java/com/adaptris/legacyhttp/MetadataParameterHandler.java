@@ -1,6 +1,6 @@
 package com.adaptris.legacyhttp;
 
-import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
