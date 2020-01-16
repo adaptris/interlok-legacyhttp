@@ -1,10 +1,8 @@
 package com.adaptris.legacyhttp;
 
 import java.util.concurrent.TimeUnit;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-
 import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.AutoPopulated;
@@ -12,8 +10,8 @@ import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.AdaptrisMessageConsumerImp;
 import com.adaptris.core.ConsumeDestination;
-import com.adaptris.core.CoreConstants;
 import com.adaptris.core.CoreException;
+import com.adaptris.core.http.jetty.JettyConstants;
 import com.adaptris.core.http.server.HeaderHandler;
 import com.adaptris.core.http.server.ParameterHandler;
 import com.adaptris.core.security.access.IdentityVerifier;
@@ -35,8 +33,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * <li>No support for {@code Expect: 102-Processing} directives</li>
  * <li>The HTTP method is not filtered based on {@link ConsumeDestination#getFilterExpression()}, so implicitly all methods are
  * passed to the workflow.</li>
- * <li>{@link CoreConstants#JETTY_URL} will not be populated (as this does not appear to be available from {@link HttpExchange}, but
- * {@link CoreConstants#JETTY_URI}, {@link CoreConstants#HTTP_METHOD}, {@link CoreConstants#JETTY_QUERY_STRING} will.</li>
+ * <li>{@link JettyConstants#JETTY_URL} will not be populated (as this does not appear to be available from {@link HttpExchange},
+ * but {@link JettyConstants#JETTY_URI}, {@link JettyConstants#HTTP_METHOD}, {@link JettyConstants#JETTY_QUERY_STRING} will.</li>
  * </ul>
  * 
  * @author ellidges

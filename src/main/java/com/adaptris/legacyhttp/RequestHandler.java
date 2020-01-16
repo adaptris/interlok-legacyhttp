@@ -1,20 +1,18 @@
 package com.adaptris.legacyhttp;
 
 import static com.adaptris.core.AdaptrisMessageFactory.defaultIfNull;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.ArrayBlockingQueue;
-
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreConstants;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.MetadataElement;
+import com.adaptris.core.http.jetty.JettyConstants;
 import com.adaptris.core.http.server.HttpStatusProvider.HttpStatus;
 import com.adaptris.core.util.Args;
 import com.sun.net.httpserver.Headers;
@@ -58,13 +56,13 @@ class RequestHandler implements HttpHandler {
         }
       }
 
-      msg.addMetadata(CoreConstants.JETTY_URI, exchange.getRequestURI().getPath());
+      msg.addMetadata(JettyConstants.JETTY_URI, exchange.getRequestURI().getPath());
       msg.addMetadata(CoreConstants.HTTP_METHOD, exchange.getRequestMethod());
 
       consumer.getHeaderHandler().handleHeaders(msg, exchange);
 
       if (exchange.getRequestURI().getQuery() != null) {
-        msg.addMetadata(CoreConstants.JETTY_QUERY_STRING, exchange.getRequestURI().getQuery());
+        msg.addMetadata(JettyConstants.JETTY_QUERY_STRING, exchange.getRequestURI().getQuery());
         consumer.getParameterHandler().handleParameters(msg, exchange);
       }
 
