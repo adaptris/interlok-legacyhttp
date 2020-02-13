@@ -63,7 +63,7 @@ public class LegacyHttpConnectionTest extends BaseCase {
 
     return new AdaptrisMessageListener() {
       @Override
-      public void onAdaptrisMessage(AdaptrisMessage msg) {
+      public void onAdaptrisMessage(AdaptrisMessage msg, java.util.function.Consumer<AdaptrisMessage> s) {
         try {
           list.doService(msg);
         }
