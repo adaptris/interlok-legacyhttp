@@ -3,7 +3,6 @@ package com.adaptris.legacyhttp;
 import static com.adaptris.legacyhttp.LegacyHttpConnection.DEFAULT_REQUEST_BACKLOG;
 import static com.adaptris.legacyhttp.LegacyHttpConnection.DEFAULT_SERVER_HOST;
 import static com.adaptris.legacyhttp.LegacyHttpConnection.DEFAULT_SERVER_PORT;
-
 import com.adaptris.core.ConfiguredConsumeDestination;
 import com.adaptris.core.ConsumerCase;
 import com.adaptris.core.StandaloneConsumer;
@@ -11,16 +10,9 @@ import com.adaptris.core.StandaloneConsumer;
 public class HttpConsumerTest extends ConsumerCase {
 
 
-  public HttpConsumerTest(String name) {
-    super(name);
-  }
-
   @Override
-  protected void setUp() throws Exception {
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
+  public boolean isAnnotatedForJunit4() {
+    return true;
   }
 
   @Override

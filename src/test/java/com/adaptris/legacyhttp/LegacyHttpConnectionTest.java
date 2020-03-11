@@ -1,13 +1,15 @@
 package com.adaptris.legacyhttp;
 
+import static org.junit.Assert.assertEquals;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
-
+import org.junit.After;
 import org.junit.Assert;
-
+import org.junit.Before;
+import org.junit.Test;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageListener;
 import com.adaptris.core.BaseCase;
@@ -24,19 +26,19 @@ import com.adaptris.core.util.LifecycleHelper;
 
 public class LegacyHttpConnectionTest extends BaseCase {
 
-  public LegacyHttpConnectionTest(java.lang.String testName) {
-    super(testName);
+  @Override
+  public boolean isAnnotatedForJunit4() {
+    return true;
   }
-
   private int port;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUpLegacyHttpConnectionTest() throws Exception {
     port = PortManager.nextUnusedPort(9090);
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDownLegacyHttpConnectionTest() throws Exception {
     PortManager.release(port);
   }
 
@@ -61,7 +63,7 @@ public class LegacyHttpConnectionTest extends BaseCase {
 
     return new AdaptrisMessageListener() {
       @Override
-      public void onAdaptrisMessage(AdaptrisMessage msg) {
+      public void onAdaptrisMessage(AdaptrisMessage msg, java.util.function.Consumer<AdaptrisMessage> s) {
         try {
           list.doService(msg);
         }
@@ -77,6 +79,7 @@ public class LegacyHttpConnectionTest extends BaseCase {
     };
   }
 
+  @Test
   public void testNoRoute() throws Exception {
     StandaloneConsumer consumer = LifecycleHelper.initAndStart(createConsumer(port, createListener(new MockMessageProducer())));
     try {
@@ -90,6 +93,7 @@ public class LegacyHttpConnectionTest extends BaseCase {
     }
   }
 
+  @Test
   public void testGet() throws Exception {
     StandaloneConsumer consumer = LifecycleHelper.initAndStart(createConsumer(port, createListener(new MockMessageProducer())));
     try {
@@ -103,6 +107,7 @@ public class LegacyHttpConnectionTest extends BaseCase {
     }
   }
 
+  @Test
   public void testPost() throws Exception {
     StandaloneConsumer consumer = LifecycleHelper.initAndStart(createConsumer(port, createListener(new MockMessageProducer())));
     try {
@@ -130,6 +135,7 @@ public class LegacyHttpConnectionTest extends BaseCase {
     }
   }
 
+  @Test
   public void testWithMetadataHeadersAndParams() throws Exception {
     MockMessageProducer producer = new MockMessageProducer();
     LegacyHttpConsumer consumer = new LegacyHttpConsumer(new ConfiguredConsumeDestination("/test"));
